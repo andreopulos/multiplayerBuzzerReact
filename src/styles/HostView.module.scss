@@ -1,0 +1,66 @@
+
+
+.authWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #f0f2f5;
+}
+
+.authCard {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  text-align: center;
+  
+  input {
+    display: block;
+    width: 100%;
+    margin: 1rem 0;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+  }
+}
+
+.adminContainer {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.dashboardGrid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 20px;
+  margin-top: 2rem;
+}
+
+.rankItem {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  border: 1px solid #eee;
+
+  &.winner {
+    background: #ffd700; // Assicurati di averla definita in _variables.scss
+    border-color: darken(#ffd700, 10%);
+    font-weight: bold;
+    transform: scale(1.02);
+  }
+}
+
+.badge {
+  background: #e1f5fe;
+  color: #01579b;
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  margin: 5px;
+  display: inline-block;
+}
