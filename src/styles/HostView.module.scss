@@ -1,28 +1,50 @@
+@use "./mixins" as *;
+@use "./palette" as *;
 
 
-.authWrapper {
+
+.authContainer {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background: #f0f2f5;
+  row-gap: 1rem;
+  flex-direction: column;
+  flex-wrap: nowrap;
 }
 
-.authCard {
+@include logoGOG;
+
+.loginCard {
   background: white;
   padding: 2rem;
   border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   text-align: center;
-  
+  color: #111;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  row-gap: 1rem;
+
   input {
-    display: block;
-    width: 100%;
-    margin: 1rem 0;
+    margin: 0;
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 6px;
   }
+
+  button {
+    @include btnApp;
+
+  }
+}
+
+.card {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: center;
+  display: flex;
 }
 
 .adminContainer {
@@ -63,4 +85,52 @@
   font-size: 0.85rem;
   margin: 5px;
   display: inline-block;
+}
+
+.controlPanel {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  translate: -50%;
+  background: rgb(255 255 255 / 20%);
+  padding: 0.5rem;
+  border-radius: 0.9rem;
+  @include buttons;
+}
+
+.settings-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 60%;
+  justify-content: space-between;
+}
+
+.onlineSection{
+  font-size: 1.5rem;
+}
+
+.rankSection {
+
+
+  .rankList {
+    font-size: 1.5rem;
+    width: 100%;
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    box-shadow: 0.3125rem 0.3125rem 0.9375rem rgba(0, 0, 0, 0.3);
+    border: 0.25rem solid $quiz-3-hex;
+    overflow: auto;
+
+    .listItem{
+      font-size: 2rem;
+    }
+  }
+
 }
