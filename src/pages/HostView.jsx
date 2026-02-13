@@ -57,7 +57,7 @@ const HostView = () => {
             onChange={(e) => setPassword(e.target.value)}
             className={styles.input}
           />
-          <button onClick={handleLogin} className={styles.loginBtn}>Accedi</button>
+          <button onClick={handleLogin} className={styles.confirmButton}>Accedi</button>
         </div>
       </div>
     );
