@@ -167,8 +167,8 @@
     }
   }
 
-  .plusBtn {
-    background-color: #4caf50;
+  .plusBtn, .minusBtn {
+    background-color: $quiz-5-hex;
     border: none;
     color: white;
     padding: 5px 10px;

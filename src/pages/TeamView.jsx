@@ -106,7 +106,7 @@ const TeamView = () => {
         </div>
       ) : (
         <div className={styles.container}>
-          <div className={styles.timerDisplay}>{timer}</div>
+          <div className={styles.timerDisplay}>{timer}<span><small>sec</small></span></div>
           <button 
             className={styles.buzzer2} 
             disabled={isBtnDisabled} 

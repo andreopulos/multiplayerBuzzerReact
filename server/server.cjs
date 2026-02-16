@@ -126,6 +126,14 @@ io.on('connection', (socket) => {
             }
 
             io.emit('updateList', buzzedTeams);
+            
+            const totalTeams = Object.keys(connectedTeams).length;
+            if (buzzedTeams.length >= totalTeams) {
+                isLocked = true;
+                clearInterval(countdown);
+                io.emit('sessionEnded');
+                console.log("Tutte le squadre hanno risposto. Timer fermato.");
+            }
         }
     });
 
