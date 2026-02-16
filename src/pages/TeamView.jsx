@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useSocket } from '../hooks/useSocket';
 import styles from '../styles/TeamView.module.scss';
 import logoImg from '../assets/Logo_Team_GOG_new.png';
+import logoEvent from '../assets/logo_gogabanda.png';
+import button from '../assets/button.png';
 
 const TeamView = () => {
   const socket = useSocket();
@@ -39,11 +41,12 @@ const TeamView = () => {
       setStatus('⏰ Tempo scaduto! ⏰');
     });
 
-    socket.on('forceReset', () => {
+    socket.on('forceReset', (newTimer) => {
       setIsBtnDisabled(true);
       setBtnText('PRONTI? 🤔');
       setStatus('In attesa della domanda... ♾️');
-      setTimer('⏳');
+      if (newTimer) setTimer(newTimer); // Aggiorna il display del timer con i secondi corretti
+      else setTimer('⏳');
     });
 
     socket.on('authError', (msg) => {
@@ -80,10 +83,9 @@ const TeamView = () => {
 
   return (
     <div className={styles.mainContainer}>
-      <img src={logoImg} alt="Team GOG Logo" className={styles.logo} />
-
+      {/* <img src={logoImg} alt="Team GOG Logo" className={styles.logo} /> */}
+      <img src={logoEvent} alt="Team GOG Event Logo" className={styles.logoEvent}/>
       {!isRegistered ? (
-        /* Schermata di Setup (Ex #setup) */
         <div className={styles.container}>
           <h1>🥳 Entra nel gioco ✨</h1>
           <input 
@@ -98,15 +100,14 @@ const TeamView = () => {
           </button>
         </div>
       ) : (
-        /* Schermata di Gioco (Ex #game) */
         <div className={styles.container}>
           <div className={styles.timerDisplay}>{timer}</div>
           <button 
-            className={styles.buzzer} 
+            className={styles.buzzer2} 
             disabled={isBtnDisabled} 
             onClick={handleBuzz}
           >
-            {btnText}
+            <img src={button} alt="Team GOG Logo" />
           </button>
           <div className={styles.status}>{status}</div>
         </div>

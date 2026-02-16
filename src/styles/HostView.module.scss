@@ -44,6 +44,27 @@
   flex-wrap: nowrap;
   align-items: center;
   display: flex;
+
+  .timer{
+    font-size: 10rem;
+    color: $quiz-5-hex;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  .twoColumn{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5rem;
+    width: 100%;
+    @media (min-width: 768px) {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+  }
 }
 
 .adminContainer {
@@ -84,6 +105,7 @@
   font-size: 0.85rem;
   margin: 5px;
   display: inline-block;
+  font-size: 1.2rem;
 }
 
 .controlPanel {
@@ -113,17 +135,15 @@
 }
 
 .rankSection {
+  font-size: 1.5rem;
 
   .rankList {
-    font-size: 1.5rem;
-    width: 100%;
+    font-size: 1.2rem;
     border-radius: 0.75rem;
-    padding: 1.25rem;
+    padding: .5rem;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    box-shadow: 0.3125rem 0.3125rem 0.9375rem rgba(0, 0, 0, 0.3);
-    border: 0.25rem solid $quiz-3-hex;
     overflow: auto;
 
     .listItem{

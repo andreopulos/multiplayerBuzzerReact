@@ -51,6 +51,12 @@ $border-radius: 0.75rem !default;
     }
 }
 
+@mixin logoEvent {
+    .logoEvent {
+        width: 220px;
+    }
+}
+
 @mixin buttons {
 
   button,

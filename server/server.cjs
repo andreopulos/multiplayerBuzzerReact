@@ -13,7 +13,7 @@ const io = new Server(server, {
   }
 });
 
-const HOST_PASSWORD = "adminBuzz2026"; // Password per il conduttore
+const HOST_PASSWORD = "adminGog2026"; // Password per il conduttore
 const PORT = process.env.PORT || 3004;
 
 let buzzedTeams = [];
@@ -24,6 +24,7 @@ let connectedTeams = {};
 
 let isHostAuthenticated = false;
 let hostSocketId = null;
+let sessionStartTime = 0;
 
 app.use(express.static('public'));
 
@@ -77,6 +78,7 @@ io.on('connection', (socket) => {
         buzzedTeams = [];
         isLocked = false;
         timerSeconds = seconds;
+        sessionStartTime = Date.now();
         io.emit('sessionStarted', { seconds: timerSeconds });
         io.emit('updateList', []);
 
@@ -100,7 +102,9 @@ io.on('connection', (socket) => {
 
         const alreadyBuzzed = buzzedTeams.find(t => t.id === socket.id);
         if (!alreadyBuzzed) {
-            const teamData = { id: socket.id, name: teamName, time: new Date().getTime() };
+            const now = Date.now();
+            const reactionTime = (now - sessionStartTime) / 1000;
+            const teamData = { id: socket.id, name: teamName, time: reactionTime.toFixed(3) };
             buzzedTeams.push(teamData);
 
             // Se è il primo, invia segnale per il suono
@@ -112,12 +116,18 @@ io.on('connection', (socket) => {
         }
     });
 
-    socket.on('reset', () => {
+    socket.on('reset', (newDuration) => {
         buzzedTeams = [];
         isLocked = true;
         clearInterval(countdown);
+        
+        if (newDuration) {
+            timerSeconds = newDuration;
+        }
+
         io.emit('updateList', []);
-        io.emit('forceReset');
+        io.emit('timerUpdate', timerSeconds); 
+        io.emit('forceReset', timerSeconds);
     });
 });
 
