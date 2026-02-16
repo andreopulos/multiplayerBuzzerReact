@@ -38,8 +38,21 @@ io.on('connection', (socket) => {
             return socket.emit('authError', 'Accesso negato: Il conduttore non è ancora attivo. Riprova più tardi.');
         }
 
-        connectedTeams[socket.id] = name;
+        connectedTeams[socket.id] = { name: name, score: 0 };
         io.emit('updateOnlineList', Object.values(connectedTeams));
+    });
+
+    // Nuova logica per aggiornare i punti
+    socket.on('updateScore', ({ teamName, amount }) => {
+        // Cerchiamo il team nell'oggetto connectedTeams
+        const teamEntry = Object.entries(connectedTeams).find(([id, data]) => data.name === teamName);
+        
+        if (teamEntry) {
+            const [id, data] = teamEntry;
+            connectedTeams[id].score += amount;
+            // Comunichiamo a tutti la lista aggiornata (nomi + punti) 
+            io.emit('updateOnlineList', Object.values(connectedTeams));
+        }
     });
 
 

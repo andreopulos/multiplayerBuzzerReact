@@ -15,6 +15,7 @@ const TeamView = () => {
   const [timer, setTimer] = useState('⏳');
   const [isBtnDisabled, setIsBtnDisabled] = useState(true);
   const [btnText, setBtnText] = useState('PRONTI? 🤔');
+  const [myScore, setMyScore] = useState(0);
 
   // Funzione per il Buzz (memorizzata con useCallback per l'event listener)
   const handleBuzz = useCallback(() => {
@@ -64,6 +65,10 @@ const TeamView = () => {
 
     window.addEventListener('keydown', handleKeyDown);
 
+    socket.on('updateOnlineList', (teams) => {
+        const me = teams.find(t => t.name === name);
+        if (me) setMyScore(me.score);
+      });
     // Cleanup: rimuoviamo tutto quando il componente "muore"
     return () => {
       socket.off('sessionStarted');
@@ -109,6 +114,9 @@ const TeamView = () => {
           >
             <img src={button} alt="Team GOG Logo" />
           </button>
+          <div className={styles.scoreBoard}>
+            Punti: {myScore}
+          </div>
           <div className={styles.status}>{status}</div>
         </div>
       )}

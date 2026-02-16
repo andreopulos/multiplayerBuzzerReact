@@ -4,6 +4,7 @@ import styles from '../styles/HostView.module.scss';
 import buzzerSound from '../assets/buzzer.mp3'; // Importiamo il file audio
 import logoImg from '../assets/Logo_Team_GOG_new.png';
 import Modal from '../components/Modal/Modal';
+import logoEvent from '../assets/logo_gogabanda.png';
 
 const HostView = () => {
   const socket = useSocket();
@@ -60,8 +61,12 @@ const HostView = () => {
     socket.emit('startSession', parseInt(duration));
   }
   const handleReset = () => {
-  socket.emit('reset', duration); 
-};
+    socket.emit('reset', duration); 
+  };
+
+  const changeScore = (teamName, amount) => {
+    socket.emit('updateScore', { teamName, amount });
+  };
 
   if (!isAuthenticated) {
     return (
@@ -90,15 +95,17 @@ const HostView = () => {
         <h2>Gestione Quiz - Team GOG</h2>
 
         <div className={styles.timer}>
-          ⏲️ {timer}
+          <img src={logoEvent} alt="Timer" className={styles.logoEvent}/> <span>{timer}<small>sec</small></span>
         </div>
         <div className={styles.twoColumn} >
           <div className={styles.onlineSection}>
             <h3>Squadre Connesse: {onlineTeams.length}</h3>
             <div className={styles.onlineList}>
-              {onlineTeams.map((name, i) => (
-                <span key={i} className={styles.badge}>{name}</span>
-              ))}
+              {onlineTeams.map((team, i) => (
+                  <span key={i} className={styles.badge}>
+                    {team.name}: <strong>{team.score}</strong>
+                  </span>
+                ))}
             </div>
           </div>
 
@@ -109,9 +116,11 @@ const HostView = () => {
             ) : (
               <div className={styles.rankList}>
                 {buzzList.map((team, i) => (
-                  <div key={team.id} className={`${styles.listItem} ${i === 0 ? styles.first : ''}`}>
+                  <div key={team.id} className={`${styles.listItem}`}>
                     <span>{i + 1}. <strong>{team.name}</strong> in {team.time}sec</span>
                     {i === 0 && <span className={styles.crown}>👑</span>}
+                      <button onClick={() => changeScore(team.name, 1)} className={styles.plusBtn}>+1</button>
+                      <button onClick={() => changeScore(team.name, -1)} className={styles.minusBtn}>-1</button>
                   </div>
                 ))}
               </div>)}
