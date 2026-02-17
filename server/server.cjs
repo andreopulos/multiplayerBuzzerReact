@@ -26,15 +26,27 @@ let isHostAuthenticated = false;
 let hostSocketId = null;
 let sessionStartTime = 0;
 
+let duelMode = false;
+let duelState = {
+    teams: [], 
+    currentTurnIndex: 0,
+    timers: [30, 30],
+    isTimerRunning: false,
+    results: [Array(7).fill(null), Array(7).fill(null)], // Griglia 7x2
+    currentQuestionIndices: [0, 0], // Indice della domanda attuale per ogni team
+    winner: null,
+    isWaitingForResult: false,
+    winner: null
+};
+
 app.use(express.static('public'));
 
 io.on('connection', (socket) => {
     console.log('Un utente si è connesso:', socket.id);
 
-    // 1. Blocco Registrazione Team
+    // Registrazione Team
     socket.on('registerTeam', (name) => {
         if (!isHostAuthenticated) {
-            // Inviamo un errore specifico al client
             return socket.emit('authError', 'Accesso negato: Il conduttore non è ancora attivo. Riprova più tardi.');
         }
 
@@ -44,24 +56,20 @@ io.on('connection', (socket) => {
 
     // Nuova logica per aggiornare i punti
     socket.on('updateScore', ({ teamName, amount }) => {
-        // Cerchiamo il team nell'oggetto connectedTeams
         const teamEntry = Object.entries(connectedTeams).find(([id, data]) => data.name === teamName);
         
         if (teamEntry) {
             const [id, data] = teamEntry;
             connectedTeams[id].score += amount;
-            // Comunichiamo a tutti la lista aggiornata (nomi + punti) 
             io.emit('updateOnlineList', Object.values(connectedTeams));
         }
     });
-
-
 
     // 2. Gestione Login Host migliorata
     socket.on('hostLogin', (password) => {
         if (password === HOST_PASSWORD) {
             isHostAuthenticated = true;
-            hostSocketId = socket.id; // Memorizziamo chi è l'host
+            hostSocketId = socket.id;
             socket.emit('authSuccess');
             console.log("Host autenticato correttamente.");
         } else {
@@ -71,13 +79,10 @@ io.on('connection', (socket) => {
 
     // 3. Gestione Disconnessione
     socket.on('disconnect', () => {
-        // Se si disconnette l'host, resettiamo lo stato di sicurezza
         if (socket.id === hostSocketId) {
             console.log("L'Host si è disconnesso. Sessione bloccata.");
             isHostAuthenticated = false;
             hostSocketId = null;
-            // Opzionale: puoi resettare tutto o lasciare che le squadre restino connesse
-            // ma impossibilitate a fare nuove azioni finché l'host non torna.
         }
 
         if (connectedTeams[socket.id]) {
@@ -111,8 +116,20 @@ io.on('connection', (socket) => {
 
     // Gestione Buzz
     socket.on('buzz', (teamName) => {
+        if (duelMode && duelState.isTimerRunning) {
+            const currentTeam = duelState.teams[duelState.currentTurnIndex];
+            // Solo la squadra di turno può stoppare il timer
+            if (currentTeam.name === teamName) {
+                clearInterval(countdown);
+                duelState.isTimerRunning = false;
+                duelState.isWaitingForResult = true;
+                io.emit('updateDuelState', duelState);
+                //io.emit('firstBuzzSound'); // Opzionale: suono quando stoppano
+                return; // Esci, non serve la logica del buzz normale
+            }
+        }
+        
         if (isLocked) return;
-
         const alreadyBuzzed = buzzedTeams.find(t => t.id === socket.id);
         if (!alreadyBuzzed) {
             const now = Date.now();
@@ -120,7 +137,6 @@ io.on('connection', (socket) => {
             const teamData = { id: socket.id, name: teamName, time: reactionTime.toFixed(2) };
             buzzedTeams.push(teamData);
 
-            // Se è il primo, invia segnale per il suono
             if (buzzedTeams.length === 1) {
                 io.emit('firstBuzzSound');
             }
@@ -149,6 +165,124 @@ io.on('connection', (socket) => {
         io.emit('updateList', []);
         io.emit('timerUpdate', timerSeconds); 
         io.emit('forceReset', timerSeconds);
+    });
+
+    socket.on('startDuelMode', () => {
+        const teams = Object.values(connectedTeams);
+        if (teams.length === 2) {
+            duelMode = true;
+            duelState.teams = teams;
+            duelState.currentTurnIndex = 0;
+            duelState.questionsLeft = { team0: 7, team1: 7 };
+            io.emit('duelStarted', duelState);
+        }
+    });
+
+    socket.on('nextDuelTurn', (result) => {
+        if (!duelMode) return;
+
+        // Salva risultato se presente (ESATTA, ERRATA, PASSO)
+        const currentKey = `team${duelState.currentTurnIndex}`;
+        if (result) {
+            duelState.results[currentKey].push(result);
+            duelState.questionsLeft[currentKey]--;
+        }
+
+        // Cambia turno (0 -> 1 o 1 -> 0)
+        duelState.currentTurnIndex = duelState.currentTurnIndex === 0 ? 1 : 0;
+        
+        // Ferma timer precedente e resetta per il nuovo turno
+        clearInterval(countdown);
+        isLocked = true; 
+
+        io.emit('updateDuelState', duelState);
+    });
+
+    socket.on('start7x30', () => {
+        const teams = Object.values(connectedTeams);
+        if (teams.length === 2) {
+            duelMode = true;
+            duelState = {
+                teams: teams,
+                currentTurnIndex: 0,
+                timers: [30, 30],
+                isTimerRunning: false,
+                results: [Array(7).fill(null), Array(7).fill(null)],
+                currentQuestionIndices: [0, 0],
+                winner: null
+            };
+            io.emit('duelStarted', duelState);
+        }
+    });
+
+    socket.on('toggleDuelTimer', () => {
+        if (!duelMode || duelState.isWaitingForResult) return;
+        
+        if (duelState.isTimerRunning) {
+            clearInterval(countdown);
+            duelState.isTimerRunning = false;
+        } else {
+            duelState.isTimerRunning = true;
+            countdown = setInterval(() => {
+                const idx = duelState.currentTurnIndex;
+                duelState.timers[idx] -= 0.1; // Sottrae decimi di secondo
+                
+                if (duelState.timers[idx] <= 0) {
+                        duelState.timers[idx] = 0;
+                        clearInterval(countdown);
+                        duelState.isTimerRunning = false;
+                        // Se scade il tempo, vince l'avversario
+                        duelState.winner = duelState.teams[idx === 0 ? 1 : 0].name;
+                    }
+                io.emit('updateDuelState', duelState);
+            }, 100);
+        }
+        io.emit('updateDuelState', duelState);
+    });
+
+    socket.on('duelAction', (type) => { // type: 'CORRECT', 'WRONG', 'PASS'
+        if (!duelMode || duelState.winner) return;
+
+        duelState.isWaitingForResult = false;
+
+        clearInterval(countdown);
+        duelState.isTimerRunning = false;
+        const teamIdx = duelState.currentTurnIndex;
+        const qIdx = duelState.currentQuestionIndices[teamIdx];
+
+        // Registra il risultato
+        duelState.results[teamIdx][qIdx] = type;
+
+        // Controllo Vittoria: 7 risposte corrette
+        const correctCount = duelState.results[teamIdx].filter(r => r === 'CORRECT').length;
+        if (correctCount === 7) {
+            duelState.winner = duelState.teams[teamIdx].name;
+            io.emit('updateDuelState', duelState);
+            return;
+        }
+
+        // Logica recupero "PASSO" e avanzamento
+        const findNextIndex = (current, results) => {
+            // 1. Cerca la prossima domanda mai risposta (null) dopo quella attuale
+            for (let i = current + 1; i < 7; i++) {
+                if (results[i] === null) return i;
+            }
+            // 2. Se non ce ne sono dopo, ricomincia dall'inizio cercando il primo null
+            for (let i = 0; i < 7; i++) {
+                if (results[i] === null) return i;
+            }
+            // 3. Se non ci sono più null, cerca il primo "PASS" da recuperare
+            for (let i = 0; i < 7; i++) {
+                if (results[i] === 'PASS') return i;
+            }
+            return current;
+        };
+
+        duelState.currentQuestionIndices[teamIdx] = findNextIndex(qIdx, duelState.results[teamIdx]);
+
+        // Cambia turno
+        duelState.currentTurnIndex = (teamIdx === 0) ? 1 : 0;
+        io.emit('updateDuelState', duelState);
     });
 });
 

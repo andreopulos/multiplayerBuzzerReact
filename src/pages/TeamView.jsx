@@ -14,8 +14,9 @@ const TeamView = () => {
   const [status, setStatus] = useState('In attesa della domanda... ♾️');
   const [timer, setTimer] = useState('⏳');
   const [isBtnDisabled, setIsBtnDisabled] = useState(true);
-  const [btnText, setBtnText] = useState('PRONTI? 🤔');
   const [myScore, setMyScore] = useState(0);
+  const [duelActive, setDuelActive] = useState(false);
+  const [isMyTurn, setIsMyTurn] = useState(false);
 
   // Funzione per il Buzz (memorizzata con useCallback per l'event listener)
   const handleBuzz = useCallback(() => {
@@ -31,7 +32,6 @@ const TeamView = () => {
     // Listeners Socket
     socket.on('sessionStarted', () => {
       setIsBtnDisabled(false);
-      setBtnText('PREMI ORA! 🛎️');
       setStatus('Vai, vai, vai! 🚀');
     });
 
@@ -44,9 +44,8 @@ const TeamView = () => {
 
     socket.on('forceReset', (newTimer) => {
       setIsBtnDisabled(true);
-      setBtnText('PRONTI? 🤔');
       setStatus('In attesa della domanda... ♾️');
-      if (newTimer) setTimer(newTimer); // Aggiorna il display del timer con i secondi corretti
+      if (newTimer) setTimer(newTimer);
       else setTimer('⏳');
     });
 
@@ -63,12 +62,42 @@ const TeamView = () => {
       }
     };
 
+    socket.on('duelStarted', (data) => {
+      setDuelActive(true);
+      checkMyTurn(data);
+    });
+
+    socket.on('updateDuelState', (data) => {
+      const myIdx = data.teams.findIndex(t => t.name === name);
+      if (myIdx !== -1) {
+        setTimer(data.timers[myIdx].toFixed(1)); // Mostra i propri secondi
+        const isMyTurn = data.currentTurnIndex === myIdx;
+        setIsBtnDisabled(!isMyTurn || !data.isTimerRunning);
+        setStatus(isMyTurn ? "TOCCA A TE! 🎤" : `Attendi ${data.teams[data.currentTurnIndex].name}...`);
+      }
+    });
+
     window.addEventListener('keydown', handleKeyDown);
 
     socket.on('updateOnlineList', (teams) => {
         const me = teams.find(t => t.name === name);
         if (me) setMyScore(me.score);
       });
+
+    const checkMyTurn = (data) => {
+      const currentTeamName = data.teams[data.currentTurnIndex].name;
+      // Se il nome della mia squadra corrisponde a quella di turno, abilito
+      if (name === currentTeamName) {
+        setIsMyTurn(true);
+        setIsBtnDisabled(false);
+        setStatus('È IL TUO TURNO! ⚔️');
+      } else {
+        setIsMyTurn(false);
+        setIsBtnDisabled(true);
+        setStatus(`Tocca a ${currentTeamName}... ⏳`);
+      }
+    };
+
     // Cleanup: rimuoviamo tutto quando il componente "muore"
     return () => {
       socket.off('sessionStarted');
@@ -78,7 +107,7 @@ const TeamView = () => {
       socket.off('authError');
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [socket, handleBuzz]);
+  }, [socket, name, handleBuzz]);
 
   const handleRegister = () => {
     if (!name.trim()) return alert("Inserisci un nome!");

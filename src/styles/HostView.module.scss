@@ -52,10 +52,13 @@
     display: flex;
     column-gap: 3rem;
     flex-direction: column;
+
     @media (min-width: 768px) {
       flex-direction: row;
     }
+
     @include logoEvent;
+
     span {
       small {
         font-size: 2rem;
@@ -159,7 +162,8 @@
     }
   }
 
-  .plusBtn, .minusBtn {
+  .plusBtn,
+  .minusBtn {
     background-color: #e1f5fe;
     border: none;
     color: white;
@@ -172,13 +176,101 @@
     border-radius: 0.5rem;
     cursor: pointer;
   }
-  .minusBtn{
+
+  .minusBtn {
     background-color: $quiz-5-hex;
   }
 
 }
 
-  .btnSelected {
-    background-color:  $quiz-3-hex;
+.btnSelected {
+  background-color: $quiz-3-hex;
+  color: white;
+}
+
+.questionSquares {
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.square {
+  width: 35px;
+  height: 45px;
+  border: 1px solid #555;
+  background: #1a1a1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+  position: relative;
+
+  &.CORRECT {
+    background-color: #2ecc71;
+    border-color: #27ae60;
     color: white;
   }
+
+  &.WRONG {
+    background-color: #e74c3c;
+    border-color: #c0392b;
+    color: white;
+  }
+
+  &.PASS {
+    background-color: #f1c40f;
+    border-color: #f39c12;
+    color: black;
+  }
+
+  // Stile per la domanda in corso
+  &.current {
+    border: 3px solid #00d4ff;
+    box-shadow: 0 0 10px #00d4ff;
+    transform: scale(1.1);
+    z-index: 1;
+  }
+
+  &.activePointer {
+    border: 4px solid #00f2ff !important; // Celeste acceso
+    box-shadow: 0 0 15px rgba(0, 242, 255, 0.8);
+    transform: scale(1.15);
+    background-color: #333;
+    z-index: 2;
+
+    // Piccola freccia sopra il quadrato (opzionale)
+    &::before {
+      content: '▼';
+      position: absolute;
+      top: -25px;
+      color: #00f2ff;
+      font-size: 14px;
+      animation: bounce 0.5s infinite alternate;
+    }
+  }
+}
+
+@keyframes bounce {
+  from { transform: translateY(0); }
+  to { transform: translateY(-5px); }
+}
+
+// Stile per la card della squadra di turno
+.teamDuelBox.active {
+  border: 2px solid gold;
+  background: rgba(255, 215, 0, 0.05);
+  transition: all 0.5s ease;
+}
+
+.winnerAnnounce {
+  background: gold;
+  color: black;
+  padding: 15px;
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  animation: pulse 1s infinite;
+}
