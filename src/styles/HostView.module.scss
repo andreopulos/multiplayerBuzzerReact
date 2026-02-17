@@ -1,8 +1,6 @@
 @use "./mixins" as *;
 @use "./palette" as *;
 
-
-
 .authContainer {
   display: flex;
   justify-content: center;
@@ -103,12 +101,6 @@
   border-radius: 8px;
   border: 1px solid #eee;
 
-  &.winner {
-    background: #ffd700; // Assicurati di averla definita in _variables.scss
-    border-color: darken(#ffd700, 10%);
-    font-weight: bold;
-    transform: scale(1.02);
-  }
 }
 
 .badge {

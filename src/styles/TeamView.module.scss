@@ -1,5 +1,5 @@
 @use "../styles/palette" as *;
-@import "./_mixins";
+@use "./_mixins" as *;
 
 body {
     .mainContainer {
