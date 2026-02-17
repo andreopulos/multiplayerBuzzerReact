@@ -168,7 +168,7 @@
   }
 
   .plusBtn, .minusBtn {
-    background-color: $quiz-5-hex;
+    background-color: #e1f5fe;
     border: none;
     color: white;
     padding: 5px 10px;
@@ -180,4 +180,13 @@
     border-radius: 0.5rem;
     cursor: pointer;
   }
+  .minusBtn{
+    background-color: $quiz-5-hex;
+  }
+
 }
+
+  .btnSelected {
+    background-color:  $quiz-3-hex;
+    color: white;
+  }

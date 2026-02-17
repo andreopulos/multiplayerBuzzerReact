@@ -117,7 +117,7 @@ io.on('connection', (socket) => {
         if (!alreadyBuzzed) {
             const now = Date.now();
             const reactionTime = (now - sessionStartTime) / 1000;
-            const teamData = { id: socket.id, name: teamName, time: reactionTime.toFixed(3) };
+            const teamData = { id: socket.id, name: teamName, time: reactionTime.toFixed(2) };
             buzzedTeams.push(teamData);
 
             // Se è il primo, invia segnale per il suono

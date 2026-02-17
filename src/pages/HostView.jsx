@@ -18,6 +18,7 @@ const HostView = () => {
   const [duration, setDuration] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [timer, setTimer] = useState(duration);
+  const [advancedMode, setAdvancedMode] = useState(false);
 
   useEffect(() => {
     // Listeners Socket
@@ -119,8 +120,8 @@ const HostView = () => {
                   <div key={team.id} className={`${styles.listItem}`}>
                     <span>{i + 1}. <strong>{team.name}</strong> in {team.time}sec</span>
                     {i === 0 && <span className={styles.crown}>👑</span>}
-                      <button onClick={() => changeScore(team.name, 1)} className={styles.plusBtn}>+1</button>
-                      <button onClick={() => changeScore(team.name, -1)} className={styles.minusBtn}>-1</button>
+                      <button onClick={() => changeScore(team.name, 1)} className={styles.plusBtn}>🎵</button>
+                      {advancedMode && <button onClick={() => changeScore(team.name, -1)} className={styles.minusBtn}>-1</button>}
                   </div>
                 ))}
               </div>)}
@@ -130,8 +131,8 @@ const HostView = () => {
 
 
       <div className={styles.controlPanel}>
-        <button onClick={handleStart} title='AVVIA DOMANDA'>▶️</button>
-        <button onClick={handleReset} title='RESET DOMANDA'>🔄</button>
+        <button onClick={handleStart} title='AVVIA DOMANDA' disabled={onlineTeams.length === 0}>▶️</button>
+        <button onClick={handleReset} title='RESET DOMANDA' disabled={onlineTeams.length === 0}>🔄</button>
         <button onClick={() => setIsModalOpen(true)} title='SETTINGS'>⚙️</button>
       </div>
 
@@ -147,6 +148,27 @@ const HostView = () => {
             value={duration}
             onChange={e => setDuration(Number(e.target.value))}
           />
+        </div>
+          <div className={styles["settings-row"]}>
+          <strong>ABILITA MOD. PUNTI</strong>
+          <button
+            onClick={() => {
+              setAdvancedMode(true);
+            }}
+            title="ON"
+            className={advancedMode ? `${styles.btnSelected}` : ""}
+          >
+            ON ☀️
+          </button>
+                    <button
+            onClick={() => {
+              setAdvancedMode(false);
+            }}
+            title="OFF"
+            className={!advancedMode ? `${styles.btnSelected}` : ""}
+          >
+            OFF 🌛
+          </button>
         </div>
       </Modal>
     </div>
