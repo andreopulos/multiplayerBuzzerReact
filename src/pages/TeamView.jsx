@@ -21,7 +21,7 @@ const TeamView = () => {
   // Funzione per il Buzz (memorizzata con useCallback per l'event listener)
   const handleBuzz = useCallback(() => {
     if (isBtnDisabled || !isRegistered) return;
-    
+
     socket.emit('buzz', name);
     setIsBtnDisabled(true);
     setStatus('Hai premuto! 🎉');
@@ -73,16 +73,23 @@ const TeamView = () => {
         setTimer(data.timers[myIdx].toFixed(1)); // Mostra i propri secondi
         const isMyTurn = data.currentTurnIndex === myIdx;
         setIsBtnDisabled(!isMyTurn || !data.isTimerRunning);
-        setStatus(isMyTurn ? "TOCCA A TE! 🎤" : `Attendi ${data.teams[data.currentTurnIndex].name}...`);
+        setStatus(isMyTurn ? "TOCCA A TE! 🎧" : `Attendi ${data.teams[data.currentTurnIndex].name}...`);
       }
     });
 
     window.addEventListener('keydown', handleKeyDown);
 
     socket.on('updateOnlineList', (teams) => {
-        const me = teams.find(t => t.name === name);
-        if (me) setMyScore(me.score);
-      });
+      const me = teams.find(t => t.name === name);
+      if (me) setMyScore(me.score);
+    });
+
+    socket.on('duelEnded', () => {
+      setDuelActive(false);
+      setIsMyTurn(false);
+      setStatus('Partita resettata. In attesa...');
+      setTimer('⏳');
+    });
 
     const checkMyTurn = (data) => {
       const currentTeamName = data.teams[data.currentTurnIndex].name;
@@ -118,15 +125,15 @@ const TeamView = () => {
   return (
     <div className={styles.mainContainer}>
       {/* <img src={logoImg} alt="Team GOG Logo" className={styles.logo} /> */}
-      <img src={logoEvent} alt="Team GOG Event Logo" className={styles.logoEvent}/>
+      <img src={logoEvent} alt="Team GOG Event Logo" className={styles.logoEvent} />
       {!isRegistered ? (
         <div className={styles.container}>
-          <h1>🥳 Entra nel gioco ✨</h1>
-          <input 
-            type="text" 
+          <h1>🎶 Entra nel gioco 🎧</h1>
+          <input
+            type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Nome Squadra" 
+            placeholder="Nome Squadra"
             className={styles.input}
           />
           <button className={styles.confirmButton} onClick={handleRegister}>
@@ -135,17 +142,25 @@ const TeamView = () => {
         </div>
       ) : (
         <div className={styles.container}>
-          <div className={styles.timerDisplay}>{timer}{timer !== '⏳' && <span><small>sec</small></span>}</div>
-          <button 
-            className={styles.buzzer2} 
-            disabled={isBtnDisabled} 
+          {timer !== '⏳' ?
+            (
+              <div className={styles.timerDisplay}>{timer}<span><small>sec</small></span></div>
+            ) : (
+              <div className={styles.timerDisplayPulse}>{timer}</div>
+            )
+          }
+
+          <button
+            className={styles.buzzer2}
+            disabled={isBtnDisabled}
             onClick={handleBuzz}
           >
-            <img src={button} alt="Team GOG Logo" />
+
           </button>
-          <div className={styles.scoreBoard}>
-            Punti: {myScore}
-          </div>
+          
+            <div className={styles.scoreBoard}>
+              {duelActive ? "7x30" : `Punti: ${myScore}`}              
+            </div>
           <div className={styles.status}>{status}</div>
         </div>
       )}

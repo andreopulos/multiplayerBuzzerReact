@@ -33,6 +33,14 @@ body {
         margin-bottom: 20px;
         font-size: 1.2em;
         text-align: center;
+        background: white;
+        color: $color-surface;
+        font-weight: bold;
+        
+        &::placeholder {
+            color: $color-surface;
+            opacity: 0.7;
+        }
     }
 
     .buzzer {
@@ -62,22 +70,22 @@ body {
         transform: translateY(10px);
     }
 
-    .buzzer2 {
-        width: 250px;
-        height: 250px;
-        background-color: transparent;
+    // .buzzer2 {
+    //     width: 250px;
+    //     height: 250px;
+    //     background-color: transparent;
 
-        img {
-            width: 100%;
-            height: 100%;
-        }
-    }
+    //     img {
+    //         width: 100%;
+    //         height: 100%;
+    //     }
+    // }
 
-    .buzzer2:disabled {
-        img {
-            filter: grayscale(0.4);
-        }
-    }
+    // .buzzer2:disabled {
+    //     img {
+    //         filter: grayscale(0.4);
+    //     }
+    // }
 
     .status {
         font-size: 1.5em;
@@ -86,21 +94,124 @@ body {
         margin-top: 1rem;
     }
 
-    .timerDisplay {
-        font-size: 4em;
-        color: $quiz-5-hex;
-        margin: 10px;
-        font-weight: bold;
-        span {
-            small {
-                font-size: 1.5rem;
-            }
-        }
-    }
+.timerDisplay {
+  font-size: 5rem;
+  font-weight: 800;
+  color: $color-secondary;
+  text-shadow: 0 0 20px rgba($color-primary, 0.6);
+  margin-bottom: 10px;
+  font-family: 'Orbitron', Courier, monospace;
+  
+  small {
+    font-size: 1rem;
+    color: $color-text-muted;
+    margin-left: 5px;
+  }
+}
 
+    .timerDisplayPulse{
+        animation: pulseActive 2s infinite;
+        font-size: 4em;
+    }
 
     .confirmButton {
         @include btnApp;
     }
 
+// --- Il Pulsante (Buzzer) ---
+.buzzer2 {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  border: none;
+  background: $grad-neon-pop;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  @include neon-glow($color-secondary);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 240px;
+    height: 240px;
+    border-radius: 50%;
+    border: 2px solid $color-primary;
+    opacity: 0.3;
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    // Se l'immagine è il pulsante, aggiungiamo un riflesso
+    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.9) translateY(4px);
+    filter: brightness(1.2);
+  }
+
+  &:disabled {
+    filter: grayscale(1) opacity(0.3);
+    cursor: not-allowed;
+    @include neon-glow(#000);
+    &::before { display: none; }
+  }
+
+  // Animazione pulsante quando è il tuo turno
+  &:not(:disabled) {
+    animation: pulseActive 1.5s infinite;
+  }
+}
+
+}
+// --- Info Squadra e Punti ---
+.scoreBoard {
+//   background: rgba($color-surface, 0.6);
+  backdrop-filter: blur(10px);
+  padding: 15px 30px;
+  border-radius: 2rem;
+//   border: 1px solid rgba($color-text-muted, 0.3);
+//   color: $color-secondary;  
+  font-weight: bold;
+  font-size: 1.2rem;
+//   @include neon-glow($color-secondary);
+}
+
+.statusText {
+  color: $color-text-muted;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+// --- Input Registrazione ---
+.input {
+  background: $color-bg-deep;
+  border: 2px solid $color-text-muted;
+  border-radius: 12px;
+  padding: 15px;
+  color: white;
+  font-size: 1.1rem;
+  text-align: center;
+  
+  &:focus {
+    outline: none;
+    border-color: $color-primary;
+    @include neon-glow($color-primary);
+  }
+}
+
+// --- Animazioni ---
+@keyframes pulseActive {
+    0% { transform: scale(1) rotate(0deg); }
+    50% { transform: scale(1.2) rotate(180deg); }
+    100% { transform: scale(1) rotate(360deg); }
 }

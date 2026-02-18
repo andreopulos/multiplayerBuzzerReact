@@ -1,12 +1,15 @@
+@use './palette' as *;
+
 $border-radius: 0.75rem !default;
 
 @mixin btnApp {
     align-items: center;
-    background-color: #ffb957;
-    border: 2px solid #111;
+    // background-color: #ffb957;
+    background: $grad-neon-pop;
+    border: 2px solid $color-surface;
     border-radius: $border-radius;
     box-sizing: border-box;
-    color: #111;
+    color: $color-surface;
     cursor: pointer;
     display: flex;
     font-size: 16px;
@@ -25,13 +28,13 @@ $border-radius: 0.75rem !default;
     font-weight: bold;
 
     &::after {
-        background-color: #111;
+        background-color: $color-surface;
         border-radius: $border-radius;
         content: "";
         display: block;
         height: 48px;
         left: 0;
-        width: 100%;
+        // width: 100%;
         position: absolute;
         top: -2px;
         transform: translate(8px, 8px);
@@ -53,7 +56,7 @@ $border-radius: 0.75rem !default;
 
 @mixin logoEvent {
     .logoEvent {
-        width: 170px;
+        width: 300px;
     }
 }
 
@@ -72,5 +75,7 @@ $border-radius: 0.75rem !default;
     align-items: center;
     justify-content: center;
     border: none;
+    background-color: $color-text-main;
+    color: $color-bg-deep;
   }
 }

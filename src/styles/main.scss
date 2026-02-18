@@ -1,4 +1,6 @@
 @forward './_fonts.scss';
+@use "./palette" as *;
+
 body {
   margin: 0;
   color: white;
@@ -34,10 +36,11 @@ body {
       left: 0;
       width: 100%;
       height: 100%;
-      // background: url('https://img.freepik.com/free-vector/abstract-pixel-rain-background_23-2148375193.jpg?t=st=1770929875~exp=1770933475~hmac=2480aa762e7e7fc7b632cfddf3629b9ccef66c3f19b63ba8058ff09c849c486c&w=1480');
+      // background: url('https://img.freepik.com/vettori-gratuito/forme-geometriche-e-sfondo-di-luci-al-neon_23-2148426707.jpg?t=st=1771449996~exp=1771453596~hmac=5e29f7d1093e2e25aa9133be578c252d1a921173f91d54e0894b477cd9e498f4&w=1480');
       z-index: -1;
       // filter: hue-rotate(67deg) blur(8px);
-      background-color: #1E2F5A;
+      background-color: $color-bg-deep;
+      // opacity: .5;;
     }
   }
 }

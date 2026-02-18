@@ -23,7 +23,7 @@ const HostView = () => {
   const [advancedMode, setAdvancedMode] = useState(false);
   const [duelData, setDuelData] = useState(null);
 
-  
+
   useEffect(() => {
     // Listeners Socket
     socket.on('authSuccess', () => setIsAuthenticated(true));
@@ -31,7 +31,7 @@ const HostView = () => {
     socket.on('updateOnlineList', (teams) => setOnlineTeams(teams));
     socket.on('updateList', (list) => setBuzzList(list));
 
-    // Nuova logica per il suono: ascolta il segnale dal server
+
     socket.on('firstBuzzSound', () => {
       if (audioRef.current) {
         audioRef.current.play().catch(e => console.log("Errore riproduzione audio:", e));
@@ -49,6 +49,10 @@ const HostView = () => {
     socket.on('duelStarted', (data) => setDuelData(data));
     socket.on('updateDuelState', (data) => setDuelData(data));
 
+    socket.on('duelEnded', () => {
+      setDuelData(null);
+    });
+
     return () => {
       socket.off('authSuccess');
       socket.off('authError');
@@ -59,6 +63,7 @@ const HostView = () => {
       socket.off('forceReset');
       socket.off('duelStarted');
       socket.off('updateDuelState');
+      socket.off('duelEnded');
     };
   }, [socket]);
 
@@ -111,7 +116,7 @@ const HostView = () => {
       <audio ref={audioRef} src={buzzerSound} /> {/* Elemento audio invisibile */}
 
       <div className={styles.card}>
-        <h2>Gestione Quiz - Team GOG</h2>
+        <h2>GOGabanda - Team GOG</h2>
         {!duelData ? (
           <>
             <div className={styles.timer}>
@@ -137,8 +142,8 @@ const HostView = () => {
                   <div className={styles.rankList}>
                     {buzzList.map((team, i) => (
                       <div key={team.id} className={`${styles.listItem}`}>
-                        <span>{i + 1}. <strong>{team.name}</strong> in {team.time}sec</span>
-                        {i === 0 && <span className={styles.crown}>👑</span>}
+
+                        <span>{i + 1}. {i === 0 && <span className={styles.crown}>👑</span>}<strong>{team.name}</strong> <small>in {team.time}sec</small></span>
                         <button onClick={() => handleChangeScore(team.name, 1)} className={styles.plusBtn}>🎵</button>
                         {advancedMode && <button onClick={() => handleChangeScore(team.name, -1)} className={styles.minusBtn}>-1</button>}
                       </div>
@@ -150,7 +155,7 @@ const HostView = () => {
         )
           : (
             <div className={styles.sarabandaContainer}>
-              <img src={logoEvent} alt="Timer" className={styles.logoEvent} />
+              {/* <img src={logoEvent} alt="Timer" className={styles.logoEvent} /> */}
               {duelData.winner && (
                 <div className={styles.winnerAnnounce}>
                   🎉 IL VINCITORE È: {duelData.winner} 🎉
@@ -203,7 +208,6 @@ const HostView = () => {
         {!duelData && (
           <>
             <button onClick={handleStart} title='AVVIA DOMANDA' disabled={onlineTeams.length === 0}>▶️</button>
-            <button onClick={handleReset} title='RESET DOMANDA' disabled={onlineTeams.length === 0}>🔄</button>
             <button onClick={() => setIsModalOpen(true)} title='SETTINGS'>⚙️</button>
           </>
         )}
@@ -218,14 +222,14 @@ const HostView = () => {
               disabled={duelData.isWaitingForResult || !!duelData.winner} // Disabilitato se c'è un buzz pendente
               style={{ opacity: duelData.isWaitingForResult ? 0.5 : 1 }}
             >
-              {duelData.isTimerRunning ? "⏸ STOP" : "▶️ MOOSECA"}
+              {duelData.isTimerRunning ? "⏸ STOP" : "▶️ MOOSECA 🎶"}
             </button>
-            <button onClick={() => duelAction('CORRECT')} className={styles.btnOk}>✅ OK</button>
-            <button onClick={() => duelAction('WRONG')} className={styles.btnErr}>❌ ERR</button>
-            <button onClick={() => duelAction('PASS')} className={styles.btnPass}>🟡 PASSO</button>
+            <button onClick={() => duelAction('CORRECT')} className={styles.btnOk}>✅</button>
+            <button onClick={() => duelAction('WRONG')} className={styles.btnErr}>❌</button>
+            <button onClick={() => duelAction('PASS')} className={styles.btnPass}>🟡</button>
           </>
         )}
-
+        <button onClick={handleReset} title='RESET DOMANDA' disabled={onlineTeams.length === 0}>🔄</button>
       </div>
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>

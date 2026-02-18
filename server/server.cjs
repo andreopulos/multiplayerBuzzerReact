@@ -6,11 +6,11 @@ const path = require('path');
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
-  cors: {
-    origin: "http://localhost:5173", // URL del tuo ambiente React (Vite)
-    methods: ["GET", "POST"],
-    credentials: true
-  }
+    cors: {
+        origin: "http://localhost:5173", // URL del tuo ambiente React (Vite)
+        methods: ["GET", "POST"],
+        credentials: true
+    }
 });
 
 const HOST_PASSWORD = "adminGog2026"; // Password per il conduttore
@@ -28,7 +28,7 @@ let sessionStartTime = 0;
 
 let duelMode = false;
 let duelState = {
-    teams: [], 
+    teams: [],
     currentTurnIndex: 0,
     timers: [30, 30],
     isTimerRunning: false,
@@ -43,7 +43,19 @@ app.use(express.static('public'));
 
 io.on('connection', (socket) => {
     console.log('Un utente si è connesso:', socket.id);
-
+    // Definiamo una funzione per resettare lo stato del duello per riutilizzarla
+    function resetDuelState() {
+        return {
+            teams: [],
+            currentTurnIndex: 0,
+            timers: [30, 30],
+            isTimerRunning: false,
+            results: [Array(7).fill(null), Array(7).fill(null)],
+            currentQuestionIndices: [0, 0],
+            winner: null,
+            isWaitingForResult: false
+        };
+    }
     // Registrazione Team
     socket.on('registerTeam', (name) => {
         if (!isHostAuthenticated) {
@@ -54,10 +66,10 @@ io.on('connection', (socket) => {
         io.emit('updateOnlineList', Object.values(connectedTeams));
     });
 
-    // Nuova logica per aggiornare i punti
+
     socket.on('updateScore', ({ teamName, amount }) => {
         const teamEntry = Object.entries(connectedTeams).find(([id, data]) => data.name === teamName);
-        
+
         if (teamEntry) {
             const [id, data] = teamEntry;
             connectedTeams[id].score += amount;
@@ -83,6 +95,8 @@ io.on('connection', (socket) => {
             console.log("L'Host si è disconnesso. Sessione bloccata.");
             isHostAuthenticated = false;
             hostSocketId = null;
+            duelMode = false;
+            io.emit('duelEnded');
         }
 
         if (connectedTeams[socket.id]) {
@@ -128,7 +142,7 @@ io.on('connection', (socket) => {
                 return; // Esci, non serve la logica del buzz normale
             }
         }
-        
+
         if (isLocked) return;
         const alreadyBuzzed = buzzedTeams.find(t => t.id === socket.id);
         if (!alreadyBuzzed) {
@@ -142,7 +156,7 @@ io.on('connection', (socket) => {
             }
 
             io.emit('updateList', buzzedTeams);
-            
+
             const totalTeams = Object.keys(connectedTeams).length;
             if (buzzedTeams.length >= totalTeams) {
                 isLocked = true;
@@ -157,14 +171,20 @@ io.on('connection', (socket) => {
         buzzedTeams = [];
         isLocked = true;
         clearInterval(countdown);
-        
+
+        duelMode = false;
+        duelState = resetDuelState();
+
         if (newDuration) {
             timerSeconds = newDuration;
         }
 
         io.emit('updateList', []);
-        io.emit('timerUpdate', timerSeconds); 
+        io.emit('timerUpdate', timerSeconds);
         io.emit('forceReset', timerSeconds);
+
+        // Avvisa tutti i client che il duello è terminato/cancellato
+        io.emit('duelEnded');
     });
 
     socket.on('startDuelMode', () => {
@@ -190,10 +210,10 @@ io.on('connection', (socket) => {
 
         // Cambia turno (0 -> 1 o 1 -> 0)
         duelState.currentTurnIndex = duelState.currentTurnIndex === 0 ? 1 : 0;
-        
+
         // Ferma timer precedente e resetta per il nuovo turno
         clearInterval(countdown);
-        isLocked = true; 
+        isLocked = true;
 
         io.emit('updateDuelState', duelState);
     });
@@ -202,22 +222,15 @@ io.on('connection', (socket) => {
         const teams = Object.values(connectedTeams);
         if (teams.length === 2) {
             duelMode = true;
-            duelState = {
-                teams: teams,
-                currentTurnIndex: 0,
-                timers: [30, 30],
-                isTimerRunning: false,
-                results: [Array(7).fill(null), Array(7).fill(null)],
-                currentQuestionIndices: [0, 0],
-                winner: null
-            };
+            duelState = resetDuelState(); // Usa la funzione per pulire tutto
+            duelState.teams = teams;
             io.emit('duelStarted', duelState);
         }
     });
 
     socket.on('toggleDuelTimer', () => {
         if (!duelMode || duelState.isWaitingForResult) return;
-        
+
         if (duelState.isTimerRunning) {
             clearInterval(countdown);
             duelState.isTimerRunning = false;
@@ -226,14 +239,14 @@ io.on('connection', (socket) => {
             countdown = setInterval(() => {
                 const idx = duelState.currentTurnIndex;
                 duelState.timers[idx] -= 0.1; // Sottrae decimi di secondo
-                
+
                 if (duelState.timers[idx] <= 0) {
-                        duelState.timers[idx] = 0;
-                        clearInterval(countdown);
-                        duelState.isTimerRunning = false;
-                        // Se scade il tempo, vince l'avversario
-                        duelState.winner = duelState.teams[idx === 0 ? 1 : 0].name;
-                    }
+                    duelState.timers[idx] = 0;
+                    clearInterval(countdown);
+                    duelState.isTimerRunning = false;
+                    // Se scade il tempo, vince l'avversario
+                    duelState.winner = duelState.teams[idx === 0 ? 1 : 0].name;
+                }
                 io.emit('updateDuelState', duelState);
             }, 100);
         }
@@ -294,7 +307,7 @@ app.use(express.static(path.join(__dirname, '../client/dist')));
 // Se ancora dà errore, usa:
 // Nota: NON usare le virgolette intorno a /.*/
 app.get(/.*/, (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/dist', 'index.html'));
+    res.sendFile(path.join(__dirname, '../client/dist', 'index.html'));
 });
 
 server.listen(PORT, '0.0.0.0', () => {

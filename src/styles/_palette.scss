@@ -12,3 +12,37 @@ $background-ranking: #f3dec2;
 $color-text-ranking: #5a4a3a;
 $border-ranking: #dcbfa0;
 $bg-color: #2f0b27;
+
+// possibili palette
+
+/* Color Theme Swatches in Hex */
+$Colorful-quiz-show-buzzer-set-1-hex: #F23568;
+$Colorful-quiz-show-buzzer-set-2-hex: #F257AC;
+$Colorful-quiz-show-buzzer-set-3-hex: #22048C;
+$Colorful-quiz-show-buzzer-set-4-hex: #F2E30C;
+$Colorful-quiz-show-buzzer-set-5-hex: #F28D35;
+
+
+// --- Palette Colori Base ---
+$color-bg-deep:      #0d122b; // Sfondo principale (Deep Space)
+$color-surface:      #1d225a; // Card e contenitori
+$color-primary:      #0c8acc; // Electric Cyan (Bottoni e link)
+$color-secondary:    #e572d8; // Vivid Magenta (Accenti e icone)
+$color-accent-gold:  #f9b233; // Sunset Gold (Highlight e premi)
+$color-text-main:    #f2e6e5; // Cloud White (Testo leggibile)
+$color-text-muted:   #5f76b1; // Blu grigiastro per testi secondari
+
+// --- Gradienti Suggeriti ---
+// Il classico gradiente "Sarabanda" per bottoni o header
+$grad-neon-pop: linear-gradient(135deg, $color-primary 0%, $color-secondary 100%);
+
+// Gradiente scuro per profondità nelle card
+$grad-dark-surface: linear-gradient(180deg, rgba($color-surface, 0.8) 0%, $color-bg-deep 100%);
+
+// Gradiente Gold per sezioni "Celebrity" o Premium
+$grad-premium: linear-gradient(45deg, #f9b233 0%, #ff8c00 100%);
+
+// --- Effetti Glow (Mixin) ---
+@mixin neon-glow($color) {
+  box-shadow: 0 0 10px rgba($color, 0.4), 0 0 20px rgba($color, 0.2);
+}
