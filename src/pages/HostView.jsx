@@ -10,7 +10,7 @@ import Numbers from 'number-to-emoji';
 
 const HostView = () => {
   const socket = useSocket();
-  const audioRef = useRef(null); // Riferimento per l'elemento audio
+  const audioRef = useRef(null);
 
   // Stati
   const [password, setPassword] = useState('');
@@ -208,7 +208,7 @@ const HostView = () => {
           </>
         )}
         {onlineTeams.length === 2 && !duelData && (
-          <button onClick={handleStartDuel} className={styles.duelBtn}>⚔️ AVVIA 7x30</button>
+          <button onClick={handleStartDuel} title='AVVIA 7x30' className={`${styles.duelBtn} ${styles.gold}`}>⚔️</button>
         )}
         {duelData && (
           <>
