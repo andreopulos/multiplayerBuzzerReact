@@ -57,7 +57,7 @@
       flex-direction: row;
     }
 
-    @include logoEvent;
+
 
     span {
       small {
@@ -251,16 +251,12 @@
   }
 }
 
-@keyframes bounce {
-  from { transform: translateY(0); }
-  to { transform: translateY(-5px); }
-}
-
 // Stile per la card della squadra di turno
 .teamDuelBox.active {
-  border: 2px solid gold;
-  background: rgba(255, 215, 0, 0.05);
-  transition: all 0.5s ease;
+  // border: 2px solid gold;
+  // background: rgba(255, 215, 0, 0.05);
+  // transition: all 0.5s ease;
+
 }
 
 .winnerAnnounce {
@@ -273,4 +269,62 @@
   border-radius: 8px;
   margin-bottom: 20px;
   animation: pulse 1s infinite;
+}
+
+.duelFlex {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+  
+
+  .teamDuelBox {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    row-gap: 1.5rem;
+
+    .teamName {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      margin-top: 0;
+      padding: .5rem;
+      background-color: $quiz-5-hex;
+      border-radius: 0.9rem;
+    }
+
+    .squareGrid {
+      display: flex;
+      flex-direction: column-reverse;
+      flex-wrap: nowrap;
+        justify-content: center;
+        align-items: center;
+    }
+    .timerLarge{
+      font-size: 3rem;
+      color: $quiz-5-hex;
+      font-weight: bold;
+      text-align: center;
+    }
+  }
+}
+
+@include logoEvent;
+
+.sarabandaContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+@keyframes bounce {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(-5px);
+  }
 }
