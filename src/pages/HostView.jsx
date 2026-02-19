@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, use } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSocket } from '../hooks/useSocket';
 import styles from '../styles/HostView.module.scss';
 import buzzerSound from '../assets/buzzer.mp3'; // Importiamo il file audio

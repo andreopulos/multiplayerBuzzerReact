@@ -7,13 +7,15 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:5173", // URL del tuo ambiente React (Vite)
+        origin: process.env.NODE_ENV === 'production' 
+            ? "*" // Sostituisci con l'URL di Render
+            : "http://localhost:5173", // URL del tuo ambiente React (Vite)
         methods: ["GET", "POST"],
         credentials: true
     }
 });
 
-const HOST_PASSWORD = "adminGog2026"; // Password per il conduttore
+const HOST_PASSWORD = process.env.HOST_PASSWORD; // Password per il conduttore
 const PORT = process.env.PORT || 3004;
 
 let buzzedTeams = [];
@@ -310,6 +312,6 @@ app.get(/.*/, (req, res) => {
     res.sendFile(path.join(__dirname, '../client/dist', 'index.html'));
 });
 
-server.listen(PORT, '0.0.0.0', () => {
-    console.log(`MultiplayerBuzzer server running on port ${PORT}`);
+server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });
