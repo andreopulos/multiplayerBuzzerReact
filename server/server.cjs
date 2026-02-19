@@ -6,15 +6,16 @@ const path = require('path');
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
+    path: '/teamGOG/multiplayer-buzzer/socket.io/',
     cors: {
-        origin: "http://localhost:5173", // URL del tuo ambiente React (Vite)
+        origin: "https://imgs.gruppomol.lcl", // URL del tuo ambiente React (Vite)
         methods: ["GET", "POST"],
         credentials: true
     }
 });
 
 const HOST_PASSWORD = "adminGog2026"; // Password per il conduttore
-const PORT = process.env.PORT || 3004;
+const PORT = process.env.PORT || 6666;
 
 let buzzedTeams = [];
 let isLocked = true; // All'inizio nessuno può premere
