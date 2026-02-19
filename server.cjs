@@ -21,7 +21,7 @@ const PORT = process.env.PORT || 3004;
 
 let buzzedTeams = [];
 let isLocked = true; // All'inizio nessuno può premere
-let timerSeconds = 10;
+let timerSeconds = 20;
 let countdown;
 let connectedTeams = {};
 
@@ -300,7 +300,7 @@ io.on('connection', (socket) => {
     });
 });
 
-app.use(express.static(path.join(__dirname, '../client/dist')));
+app.use(express.static(path.join(__dirname, 'client/dist')));
 
 app.get(/.*/, (req, res) => {
     res.sendFile(path.join(__dirname, 'client/dist', 'index.html'));
