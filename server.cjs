@@ -15,7 +15,8 @@ const io = new Server(server, {
     }
 });
 
-const HOST_PASSWORD = process.env.HOST_PASSWORD; // Password per il conduttore
+const HOST_PASSWORD = process.env.HOST_PASSWORD || "adminGog2026"; // Password per il conduttore
+console.log(HOST_PASSWORD);
 const PORT = process.env.PORT || 3004;
 
 let buzzedTeams = [];
@@ -40,8 +41,6 @@ let duelState = {
     isWaitingForResult: false,
     winner: null
 };
-
-app.use(express.static('public'));
 
 io.on('connection', (socket) => {
     console.log('Un utente si è connesso:', socket.id);
@@ -301,13 +300,8 @@ io.on('connection', (socket) => {
     });
 });
 
-// 1. Serve i file statici dalla cartella dist (dove andrà il build di React)
 app.use(express.static(path.join(__dirname, '../client/dist')));
 
-// 2. Gestisce il Routing di React (per far funzionare /admin anche al refresh)
-
-// Se ancora dà errore, usa:
-// Nota: NON usare le virgolette intorno a /.*/
 app.get(/.*/, (req, res) => {
     res.sendFile(path.join(__dirname, '../client/dist', 'index.html'));
 });
