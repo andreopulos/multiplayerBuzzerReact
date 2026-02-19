@@ -79,3 +79,24 @@ $border-radius: 0.75rem !default;
     color: $color-bg-deep;
   }
 }
+
+
+    @mixin pulseRotateAnimation {
+        animation: pulseActive 2s infinite;
+
+        @keyframes pulseActive {
+        0% { transform: scale(1) rotate(0deg); }
+        50% { transform: scale(1.2) rotate(180deg); }
+        100% { transform: scale(1) rotate(360deg); }
+    }
+}
+
+    @mixin pulseAnimation {
+        animation: pulseActive 2s infinite;
+
+        @keyframes pulseActive {
+        0% { transform: scale(1)}
+        50% { transform: scale(1.2)}
+        100% { transform: scale(1)}
+    }
+}

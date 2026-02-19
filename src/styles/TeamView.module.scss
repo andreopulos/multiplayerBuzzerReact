@@ -110,7 +110,7 @@ body {
 }
 
     .timerDisplayPulse{
-        animation: pulseActive 2s infinite;
+        @include pulseRotateAnimation;
         font-size: 4em;
     }
 
@@ -159,7 +159,7 @@ body {
   }
 
   &:disabled {
-    filter: grayscale(1) opacity(0.3);
+    filter: grayscale(0) opacity(0.3);
     cursor: not-allowed;
     @include neon-glow(#000);
     &::before { display: none; }
@@ -207,11 +207,4 @@ body {
     border-color: $color-primary;
     @include neon-glow($color-primary);
   }
-}
-
-// --- Animazioni ---
-@keyframes pulseActive {
-    0% { transform: scale(1) rotate(0deg); }
-    50% { transform: scale(1.2) rotate(180deg); }
-    100% { transform: scale(1) rotate(360deg); }
 }

@@ -54,10 +54,10 @@ const TeamView = () => {
       setIsRegistered(false);
     });
 
-    // Listener Tastiera (Barra Spaziatrice)
+    // Listener Tastiera (Barra Spaziatrice) + Pulsante
     const handleKeyDown = (event) => {
-      if (event.code === 'Space') {
-        event.preventDefault(); // Impedisce lo scroll della pagina
+      if (event.code === 'Space' || event.code === 'Enter') {
+        event.preventDefault();
         handleBuzz();
       }
     };
@@ -77,7 +77,9 @@ const TeamView = () => {
       }
     });
 
-    window.addEventListener('keydown', handleKeyDown);
+    if(isRegistered){
+      window.addEventListener('keydown', handleKeyDown);
+    }
 
     socket.on('updateOnlineList', (teams) => {
       const me = teams.find(t => t.name === name);

@@ -294,15 +294,16 @@
 }
 
 .winnerAnnounce {
-  background: gold;
+  background: $grad-neon-pop;
   color: black;
+  color: $color-text-main;
   padding: 15px;
   font-size: 2rem;
   font-weight: bold;
   text-align: center;
   border-radius: 8px;
   margin-bottom: 20px;
-  animation: pulse 1s infinite;
+  @include pulseAnimation;
 }
 
 .duelFlex {
@@ -317,6 +318,7 @@
     flex-direction: column;
     align-items: center;
     row-gap: 1.5rem;
+    width: 250px;
 
     .teamName {
       font-size: 2.5rem;
@@ -378,4 +380,13 @@
 
 .duelBtn {
   background-color: $quiz-4-hex
+}
+
+.onlineList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
 }

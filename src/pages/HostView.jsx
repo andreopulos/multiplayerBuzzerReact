@@ -126,7 +126,7 @@ const HostView = () => {
               <div className={styles.onlineSection}>
                 <h3>Squadre Connesse: {onlineTeams.length}</h3>
                 <div className={styles.onlineList}>
-                  {onlineTeams.map((team, i) => (
+                  {onlineTeams.sort((a, b) => b.score - a.score).map((team, i) => (
                     <span key={i} className={styles.badge}>
                       {team.name}: <strong>{team.score}</strong>
                     </span>
@@ -155,7 +155,7 @@ const HostView = () => {
         )
           : (
             <div className={styles.sarabandaContainer}>
-              {/* <img src={logoEvent} alt="Timer" className={styles.logoEvent} /> */}
+              <img src={logoEvent} alt="Timer" className={styles.logoEvent} />
               {duelData.winner && (
                 <div className={styles.winnerAnnounce}>
                   🎉 IL VINCITORE È: {duelData.winner} 🎉
@@ -204,10 +204,11 @@ const HostView = () => {
       </div>
 
 
-      <div className={styles.controlPanel}>
+      <div className={styles.controlPanel}>        
         {!duelData && (
           <>
             <button onClick={handleStart} title='AVVIA DOMANDA' disabled={onlineTeams.length === 0}>▶️</button>
+            <button onClick={handleReset} title='RESET DOMANDA' disabled={onlineTeams.length === 0}>🔄</button>
             <button onClick={() => setIsModalOpen(true)} title='SETTINGS'>⚙️</button>
           </>
         )}
@@ -227,9 +228,9 @@ const HostView = () => {
             <button onClick={() => duelAction('CORRECT')} className={styles.btnOk}>✅</button>
             <button onClick={() => duelAction('WRONG')} className={styles.btnErr}>❌</button>
             <button onClick={() => duelAction('PASS')} className={styles.btnPass}>🟡</button>
+            <button onClick={handleReset} title='RESET DOMANDA' disabled={onlineTeams.length === 0}>🔄</button>
           </>
         )}
-        <button onClick={handleReset} title='RESET DOMANDA' disabled={onlineTeams.length === 0}>🔄</button>
       </div>
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
